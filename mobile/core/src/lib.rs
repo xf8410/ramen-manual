@@ -1,14 +1,15 @@
 //! 手机版触屏决策层。
 //!
-//! 这一层不实现拉面杯规则，也不解析命令行输出。它负责把模拟器产生的
-//! 当前待决策内容转换成 Android UI 可以展示的状态，并校验触屏提交。
+//! 规则来自上游 `RamenGame`；本 crate 只负责手机版状态、触屏提交和初始化。
 
 use serde::{Deserialize, Serialize};
 
 mod protocol;
 mod ramen_driver;
+pub mod upstream;
 pub use protocol::{SubmitMessage, UiDecision, UiMessage, UiState, UiStatus};
 pub use ramen_driver::{action_options, decision_title, PortResult, RamenGameDriver, RamenGamePort};
+pub use upstream::{create_ramen_game, RamenMobileConfig};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DecisionOption { pub index: usize, pub title: String, #[serde(default)] pub detail: String }
