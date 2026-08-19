@@ -1,17 +1,10 @@
 # 手机版改造状态
 
-本轮继续完成：
+本轮继续处理运行时问题：
 
-- Rust crate 增加 `cdylib` 输出和 `jni`/`serde_json` 依赖；
-- JNI `nativeSetDataRoot`、`nativeStart`、`nativeSubmit`、`nativeReset`；
-- Android Kotlin 页面已经调用 JNI，而不是 FakeDriver；
-- Android 启动时解压拉面杯 assets，并设置 Rust 工作目录；
-- 添加 ARM64 构建说明和 Rust target 配置；
-- 修复真实适配器的候选保存、阶段推进、PC 配置初始化和结算 PT 映射。
+- 修正 Android 配置不能直接复制仓库根目录 `default_config.toml` 的问题；根目录默认配置是 `scenario=onsen`，会导致手机版拒绝启动；
+- 增加专用 `mobile/assets/game_config.toml`，明确 `scenario=ramen`、拉面杯卡组和继承配置；
+- `copy-assets.sh` 现在固定生成拉面杯配置，不再把温泉配置伪装成 `game_config.toml`；
+- 同步更新 `mobile/app/src/main/assets/game_config.toml` 模板。
 
-仍未完成：
-
-- 实际安装 NDK/SDK 后的编译验证；
-- cargo/Gradle wrapper 与 JNI 动态库产物；
-- 真机测试；
-- 固定种子与 Windows 版的回归差异检查。
+仍在继续：native library 的 Gradle/NDK 产物接入、编译验证和真机运行。
