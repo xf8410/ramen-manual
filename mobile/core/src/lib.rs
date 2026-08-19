@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 mod adapter;
+mod bridge;
 mod protocol;
 mod ramen_driver;
 pub mod runtime;
@@ -28,14 +29,7 @@ pub trait RamenDriver { fn start(&mut self) -> Result<(), String>; fn advance_un
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PendingDecisionOrFinished { Decision(PendingDecision), Finished(GameSummary) }
 pub struct TouchSession<D> { driver: D, state: MobileState }
-impl<D: RamenDriver> TouchSession<D> {
-    pub fn new(driver: D) -> Self { Self { driver, state: MobileState::WaitingForStart } }
-    pub fn state(&self) -> &MobileState { &self.state }
-    pub fn ui_state(&self) -> UiState { (&self.state).into() }
-    pub fn start(&mut self) -> Result<(), String> { self.driver.start()?; self.advance() }
-    pub fn submit(&mut self, index: usize) -> Result<(), SubmitError> { let count = match &self.state { MobileState::Decision(d) => d.options.len(), _ => return Err(SubmitError::NoDecisionPending) }; if index >= count { return Err(SubmitError::InvalidIndex { index, option_count: count }); } self.state = match self.driver.submit(index)? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) }
-    fn advance(&mut self) -> Result<(), String> { self.state = match self.driver.advance_until_decision()? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) }
-}
+impl<D: RamenDriver> TouchSession<D> { pub fn new(driver: D) -> Self { Self { driver, state: MobileState::WaitingForStart } } pub fn state(&self) -> &MobileState { &self.state } pub fn ui_state(&self) -> UiState { (&self.state).into() } pub fn start(&mut self) -> Result<(), String> { self.driver.start()?; self.advance() } pub fn submit(&mut self, index: usize) -> Result<(), SubmitError> { let count = match &self.state { MobileState::Decision(d) => d.options.len(), _ => return Err(SubmitError::NoDecisionPending) }; if index >= count { return Err(SubmitError::InvalidIndex { index, option_count: count }); } self.state = match self.driver.submit(index)? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) } fn advance(&mut self) -> Result<(), String> { self.state = match self.driver.advance_until_decision()? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) } }
 
 #[cfg(test)]
 mod tests { use super::*; #[test] fn ui_state_exposes_pending_decision() { let d = PendingDecision { turn: 2, kind: DecisionKind::Ramen, title: "选择拉面".into(), options: vec![DecisionOption { index: 0, title: "不吃面".into(), detail: String::new() }] }; let state = MobileState::Decision(d); assert_eq!(UiState::from(&state).status, UiStatus::Decision); } }
