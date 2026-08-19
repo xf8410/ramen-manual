@@ -15,6 +15,7 @@ android {
     }
     sourceSets["main"].jniLibs.srcDir("src/main/jniLibs")
     packaging { jniLibs { useLegacyPackaging = false } }
+    androidResources { noCompress += "json"; noCompress += "toml" }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -25,4 +26,3 @@ android {
 }
 
 kotlin { jvmToolchain(17) }
-androidResources { noCompress += "json"; noCompress += "toml" }
