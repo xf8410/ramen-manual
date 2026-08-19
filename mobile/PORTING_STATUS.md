@@ -1,18 +1,21 @@
 # 手机版改造状态
 
+本分支仍在持续改造中。
+
 ## 已完成
 
-- 使用 PC `ramen_manual.rs` 的真实配置创建 `RamenGame`；
-- `RamenGameAdapter` 已接入上游 `RamenGame`；
-- `PauseTrainer` 在拉面、隐藏风味、训练、地区、超级拉面和事件选择处暂停；
-- Android 通过候选索引继续执行原始动作/事件；
-- 保留上游 `game/ramen` 规则，不复制温泉杯规则。
+- 使用 PC `ramen_manual.rs` 的真实配置创建上游 `RamenGame`；
+- `RamenGameAdapter` 已实现非阻塞暂停与触屏索引提交；
+- 拉面、隐藏风味、训练、地区、超级拉面和事件选择统一转换为 UI 状态；
+- Android JSON 状态协议；
+- Android 运行数据目录校验；
+- 明确只携带 `scenario_ramen.json`，不接入温泉剧本。
 
-## 尚未完成
+## 当前继续处理
 
-- Android assets 数据目录接入；
-- ARM64/JNI 或其他 Android 前端；
-- 编译和真机验证；
-- 与 PC 版固定种子的回归结果比对。
+- Android 宿主工程和 ARM64 构建；
+- assets 解压与工作目录设置；
+- 依赖编译验证；
+- 固定种子下与 PC `ramen_manual` 的回归对照。
 
-因此当前是“真实 RamenGame 核心已接入，Android 外壳和构建仍在继续”。
+当前还不能称为 APK 完成，但已经从接口层进入真实 `RamenGame` 适配和运行时数据接入阶段。
