@@ -13,6 +13,7 @@ class MainActivity : Activity() {
 
     companion object {
         init { System.loadLibrary("ramen_mobile_core") }
+        @JvmStatic private external fun nativeSetDataRoot(path: String): Boolean
         @JvmStatic private external fun nativeStart(): String
         @JvmStatic private external fun nativeSubmit(index: Int): String
         @JvmStatic private external fun nativeReset()
@@ -24,7 +25,8 @@ class MainActivity : Activity() {
         title = TextView(this).apply { textSize = 22f }
         options = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         root.addView(title); root.addView(options); setContentView(root)
-        renderState(nativeStart())
+        val dataRoot = AssetInstaller.install(this)
+        if (!nativeSetDataRoot(dataRoot.absolutePath)) { title.text = "运行数据准备失败" } else { renderState(nativeStart()) }
     }
 
     override fun onDestroy() { nativeReset(); super.onDestroy() }
@@ -38,10 +40,7 @@ class MainActivity : Activity() {
                 title.text = "第${state.optInt("turn")}回合\n${decision.optString("title")}"
                 options.removeAllViews()
                 val list = decision.getJSONArray("options")
-                for (i in 0 until list.length()) {
-                    val option = list.getJSONObject(i)
-                    options.addView(Button(this).apply { text = option.optString("title"); setOnClickListener { renderState(nativeSubmit(option.optInt("index", i))) } })
-                }
+                for (i in 0 until list.length()) { val option = list.getJSONObject(i); options.addView(Button(this).apply { text = option.optString("title"); setOnClickListener { renderState(nativeSubmit(option.optInt("index", i))) } }) }
             }
             "finished" -> { title.text = "育成结束"; options.removeAllViews() }
             else -> { title.text = "拉面杯"; options.removeAllViews() }
