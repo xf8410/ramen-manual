@@ -16,7 +16,7 @@ struct PauseTrainer { capture: SharedCapture }
 impl PauseTrainer { fn pause(&self, capture: Capture) -> Result<usize> { *self.capture.lock().expect("capture mutex") = Some(capture); Err(anyhow!(PAUSED)) } }
 impl Trainer<RamenGame> for PauseTrainer {
     fn select_action(&self, game: &RamenGame, actions: &[RamenAction], _rng: &mut StdRng) -> Result<usize> { let kind = match game.stage { RamenStage::RamenSelect => DecisionKind::Ramen, RamenStage::SpecialSelect => DecisionKind::SpecialFeeling, RamenStage::RegionSelect => DecisionKind::Region, RamenStage::SuperRamenSelect => DecisionKind::SuperRamen, _ => DecisionKind::Training }; self.pause(Capture::Action { kind, actions: actions.to_vec() }) }
-    fn select_choice(&self, _game: &RamenGame, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> { self.pause(Capture::Event { event: EventData::default(), choices: choices.to_vec() }) }
+    fn select_choice(&self, _game: &RamenGame, _choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> { Err(anyhow!("手机版不支持无 EventData 的旧事件选择接口，请使用 select_event_choice")) }
     fn select_event_choice(&self, _game: &RamenGame, event: &EventData, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> { self.pause(Capture::Event { event: event.clone(), choices: choices.to_vec() }) }
 }
 
