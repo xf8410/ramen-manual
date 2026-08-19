@@ -6,7 +6,6 @@ plugins {
 android {
     namespace = "com.umaai.ramen"
     compileSdk = 35
-
     defaultConfig {
         applicationId = "com.umaai.ramen"
         minSdk = 26
@@ -14,10 +13,15 @@ android {
         versionCode = 1
         versionName = "0.1.0"
     }
-
-    // cargo-ndk writes native libraries into this directory.
     sourceSets["main"].jniLibs.srcDir("src/main/jniLibs")
     packaging { jniLibs { useLegacyPackaging = false } }
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
 }
 
 kotlin { jvmToolchain(17) }
