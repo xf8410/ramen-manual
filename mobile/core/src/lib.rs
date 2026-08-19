@@ -5,6 +5,9 @@
 
 use serde::{Deserialize, Serialize};
 
+mod ramen_driver;
+pub use ramen_driver::{action_options, decision_title, PortResult, RamenGameDriver, RamenGamePort};
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DecisionOption {
     pub index: usize,
@@ -49,10 +52,6 @@ pub enum SubmitError {
     InvalidIndex { index: usize, option_count: usize },
 }
 
-/// UI 与游戏适配器之间的最小协议。
-///
-/// 真正的 `RamenGame` 适配器将在导入上游源码后实现此 trait。这样 Android
-/// 前端不会依赖 `inquire`，也不会依赖 Windows 的 stdin/stdout。
 pub trait RamenDriver {
     fn start(&mut self) -> Result<(), String>;
     fn advance_until_decision(&mut self) -> Result<PendingDecisionOrFinished, String>;
@@ -65,7 +64,6 @@ pub enum PendingDecisionOrFinished {
     Finished(GameSummary),
 }
 
-/// 对触屏提交做统一校验，并保存 UI 可观察状态。
 pub struct TouchSession<D> {
     driver: D,
     state: MobileState,
@@ -76,9 +74,7 @@ impl<D: RamenDriver> TouchSession<D> {
         Self { driver, state: MobileState::WaitingForStart }
     }
 
-    pub fn state(&self) -> &MobileState {
-        &self.state
-    }
+    pub fn state(&self) -> &MobileState { &self.state }
 
     pub fn start(&mut self) -> Result<(), String> {
         self.driver.start()?;
