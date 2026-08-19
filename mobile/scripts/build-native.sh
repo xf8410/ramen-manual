@@ -11,4 +11,5 @@ rustup target list --installed | grep -q '^aarch64-linux-android$' || {
 }
 
 ./scripts/copy-assets.sh
-cargo ndk -t arm64-v8a -o app/src/main/jniLibs build --release --manifest-path core/Cargo.toml
+cd "$ROOT/mobile/core"
+cargo ndk -t arm64-v8a -o "$ROOT/mobile/app/src/main/jniLibs" build --release
