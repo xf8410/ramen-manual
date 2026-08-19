@@ -1,18 +1,18 @@
 # 手机版改造状态
 
-本分支仍在持续改造中，未视为完成。
-
 ## 已完成
 
-- `RamenGamePort` / `RamenGameDriver` 交互替换点；
-- `TouchSession` 触屏暂停、提交、继续状态机；
-- `UiState`、`UiMessage`、`SubmitMessage` JSON 协议；
-- 拉面杯专属决策类型已包含：拉面、隐藏风味、训练、地区、超级拉面、事件。
+- 使用 PC `ramen_manual.rs` 的真实配置创建 `RamenGame`；
+- `RamenGameAdapter` 已接入上游 `RamenGame`；
+- `PauseTrainer` 在拉面、隐藏风味、训练、地区、超级拉面和事件选择处暂停；
+- Android 通过候选索引继续执行原始动作/事件；
+- 保留上游 `game/ramen` 规则，不复制温泉杯规则。
 
-## 当前工作
+## 尚未完成
 
-正在把 PC 入口 `ramen_manual.rs` 的真实初始化和 `RamenGame` 逐阶段驱动接入 `RamenGamePort`。在真实适配器完成前，不能声称已经生成可运行 APK。
+- Android assets 数据目录接入；
+- ARM64/JNI 或其他 Android 前端；
+- 编译和真机验证；
+- 与 PC 版固定种子的回归结果比对。
 
-## 原则
-
-只改 PC 拉面杯程序的交互/平台层；保留 `RamenGame` 和 `game/ramen` 机制；不接入 `OnsenGame`。
+因此当前是“真实 RamenGame 核心已接入，Android 外壳和构建仍在继续”。
