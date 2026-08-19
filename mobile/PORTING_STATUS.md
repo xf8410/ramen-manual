@@ -1,21 +1,11 @@
 # 手机版改造状态
 
-本分支仍在持续改造中。
+本轮继续修复真实适配器：
 
-## 已完成
+- 待决策候选在 `pump()` 返回后保持到 `choose()`，不会提前丢失；
+- 动作提交后推进一次上游 `Game::next()`，避免重复运行当前阶段；
+- 结算 PT 使用原 PC 入口的 `game.uma.total_pt()`，不是尚未结算/已清零的 `ramen.scenario_pt`；
+- 初始化改为加载 `game_config.toml` 并调用 `init_global_with_config`，与 PC `ramen_manual.rs` 一致；
+- `RamenMobileConfig` 改为可 Clone，避免所有权错误。
 
-- 使用 PC `ramen_manual.rs` 的真实配置创建上游 `RamenGame`；
-- `RamenGameAdapter` 已实现非阻塞暂停与触屏索引提交；
-- 拉面、隐藏风味、训练、地区、超级拉面和事件选择统一转换为 UI 状态；
-- Android JSON 状态协议；
-- Android 运行数据目录校验；
-- 明确只携带 `scenario_ramen.json`，不接入温泉剧本。
-
-## 当前继续处理
-
-- Android 宿主工程和 ARM64 构建；
-- assets 解压与工作目录设置；
-- 依赖编译验证；
-- 固定种子下与 PC `ramen_manual` 的回归对照。
-
-当前还不能称为 APK 完成，但已经从接口层进入真实 `RamenGame` 适配和运行时数据接入阶段。
+仍在继续：事件暂停恢复的阶段级验证、Android assets 解压、ARM64 工程、编译和回归测试。
