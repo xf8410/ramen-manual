@@ -1,0 +1,27 @@
+# Android 拉面杯运行配置
+scenario = "ramen"
+trainer = "manual"
+log_level = "off"
+simulation_count = 1
+uma = 102601
+cards = [302424, 302894, 303044, 302924, 303024, 303054]
+blue_count = [15, 3, 0, 0, 0]
+extra_count = [0, 30, 0, 0, 30, 30]
+mcts_selection = "score"
+
+[onsen_order]
+year1 = [1, 3, 2]
+year2 = [6, 7, 4, 2]
+year3 = [8, 9, 4, 2, 5]
+
+[mcts]
+search_n = 1
+search_group_size = 1
+radical_factor_max = 0.0
+max_depth = 0
+policy_delta = 100.0
+use_ucb = false
+search_cpuct = 1.0
+expected_search_stdev = 2200.0
+rollout_batch_size = 1
+rollout_evaluator = "handwritten"
