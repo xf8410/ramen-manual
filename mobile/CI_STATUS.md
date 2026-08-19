@@ -1,20 +1,18 @@
 # CI 状态
 
-Android workflow 已加入：
+工作流：`.github/workflows/mobile-android.yml`
+
+预期步骤：
 
 ```text
-.github/workflows/mobile-android.yml
+Android SDK/NDK
+→ Rust aarch64 target
+→ cargo-ndk
+→ libramen_mobile_core.so
+→ assembleDebug
+→ APK artifact
 ```
 
-它会构建：
+当前 API 查询没有返回 workflow run，因此没有成功或失败可以报告。不能把 workflow 文件提交视为编译验证。
 
-```text
-Rust ARM64 cdylib
-→ Android JNI library
-→ Debug APK
-→ GitHub Actions artifact
-```
-
-当前分支写入 workflow 后，若 GitHub 的 `workflow_dispatch` 尚未在默认分支登记，API 可能拒绝从工作分支直接 dispatch。这不是 CI 正在占用任务；需要先创建 PR/合并 workflow 到默认分支，或在 GitHub Actions 页面手动选择该分支运行。
-
-目前没有伪造 CI 成功结果。实际编译状态必须以 Actions 日志为准。
+如果工作流不能从工作分支 dispatch，先创建 PR 让 workflow 出现在默认分支，或在 GitHub Actions 页面选择 `workbench/mobile-ramen-apk` 手动运行。
