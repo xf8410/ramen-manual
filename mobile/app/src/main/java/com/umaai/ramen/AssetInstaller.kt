@@ -14,10 +14,11 @@ object AssetInstaller {
         val root = File(context.filesDir, "ramen-data")
         for (relative in files) {
             val target = File(root, relative)
-            if (!target.exists()) {
+            if (!target.isFile) {
                 target.parentFile?.mkdirs()
                 context.assets.open(relative).use { input -> target.outputStream().use { input.copyTo(it) } }
             }
+            check(target.isFile && target.length() > 0) { "运行数据为空: $relative" }
         }
         return root
     }
