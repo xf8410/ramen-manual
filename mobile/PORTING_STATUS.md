@@ -2,15 +2,14 @@
 
 本轮继续完成：
 
-- Gradle 配置 `src/main/jniLibs`，可以打包 cargo-ndk 生成的 `.so`；
-- 增加 `mobile/scripts/build-native.sh`；
-- Android assets 安装后逐项验证文件存在且非空；
-- 构建文档明确没有 `.so` 时不能称为 APK 完成；
-- 继续使用拉面专用 `game_config.toml`，避免根目录温泉配置误用。
+- 添加 `.cargo/config.toml` 的 Android linker 配置；
+- Native crate 改为 Android 友好的 JNI 依赖配置，并加入 release 瘦身；
+- Android UI 增加数据安装异常显示、重复点击禁用、错误状态和最终评分/PT显示；
+- 继续保持所有游戏规则来自上游 `RamenGame`。
 
-未完成：
+仍未完成：
 
-- 在真实 Android SDK/NDK 环境执行 `cargo-ndk` 编译；
-- 解决上游依赖在 Android target 上的实际编译兼容性；
-- 生成并安装 APK 做真机测试；
-- 固定种子回归对照。
+- 在可用 SDK/NDK 环境实际运行 `build-native.sh`；
+- 处理 cargo 编译器报告的上游依赖错误（若有）；
+- Gradle wrapper、assembleDebug 和真机验证；
+- 与 Windows 固定种子回归对照。
