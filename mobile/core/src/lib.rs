@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 mod adapter;
 mod protocol;
 mod ramen_driver;
+pub mod runtime;
 pub mod upstream;
 pub use adapter::RamenGameAdapter;
 pub use protocol::{SubmitMessage, UiDecision, UiMessage, UiState, UiStatus};
@@ -32,22 +33,8 @@ impl<D: RamenDriver> TouchSession<D> {
     pub fn state(&self) -> &MobileState { &self.state }
     pub fn ui_state(&self) -> UiState { (&self.state).into() }
     pub fn start(&mut self) -> Result<(), String> { self.driver.start()?; self.advance() }
-    pub fn submit(&mut self, index: usize) -> Result<(), SubmitError> {
-        let count = match &self.state { MobileState::Decision(d) => d.options.len(), _ => return Err(SubmitError::NoDecisionPending) };
-        if index >= count { return Err(SubmitError::InvalidIndex { index, option_count: count }); }
-        self.state = match self.driver.submit(index)? {
-            PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d),
-            PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s),
-        };
-        Ok(())
-    }
-    fn advance(&mut self) -> Result<(), String> {
-        self.state = match self.driver.advance_until_decision()? {
-            PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d),
-            PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s),
-        };
-        Ok(())
-    }
+    pub fn submit(&mut self, index: usize) -> Result<(), SubmitError> { let count = match &self.state { MobileState::Decision(d) => d.options.len(), _ => return Err(SubmitError::NoDecisionPending) }; if index >= count { return Err(SubmitError::InvalidIndex { index, option_count: count }); } self.state = match self.driver.submit(index)? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) }
+    fn advance(&mut self) -> Result<(), String> { self.state = match self.driver.advance_until_decision()? { PendingDecisionOrFinished::Decision(d) => MobileState::Decision(d), PendingDecisionOrFinished::Finished(s) => MobileState::Finished(s) }; Ok(()) }
 }
 
 #[cfg(test)]
