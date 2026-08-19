@@ -1,0 +1,20 @@
+[package]
+name = "ramen-mobile-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+anyhow = "1"
+jni = { version = "0.21", default-features = false }
+rand = { version = "0.9", features = ["std_rng"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+umasim = { git = "https://github.com/xulai1001/umaai-rs.git", branch = "master", default-features = false }
+
+[profile.release]
+strip = "symbols"
+lto = "thin"
+codegen-units = 1
