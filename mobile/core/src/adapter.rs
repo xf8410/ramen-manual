@@ -14,6 +14,7 @@ use crate::{action_options, create_ramen_game, DecisionKind, GameSummary, Pendin
 const PAUSED: &str = "mobile decision pending";
 type SharedCapture = Rc<RefCell<Option<Capture>>>;
 
+#[derive(Clone)]
 enum Capture {
     Action { kind: DecisionKind, actions: Vec<RamenAction> },
     Event { event: Option<EventData>, choices: Vec<Vec<EventChoice>> },
@@ -53,23 +54,26 @@ pub struct RamenGameAdapter {
     config: RamenMobileConfig,
 }
 impl RamenGameAdapter {
-    pub fn new(config: RamenMobileConfig) -> Result<Self, String> {
-        let (_, rng) = create_ramen_game(config).map_err(|e| e.to_string())?;
-        Ok(Self { game: None, rng, capture: Rc::new(RefCell::new(None)), config })
+    pub fn new(config: RamenMobileConfig) -> Self {
+        use rand::SeedableRng;
+        Self { game: None, rng: StdRng::seed_from_u64(config.seed), capture: Rc::new(RefCell::new(None)), config }
     }
     fn game(&self) -> Result<&RamenGame, String> { self.game.as_ref().ok_or_else(|| "游戏尚未初始化".into()) }
     fn game_mut(&mut self) -> Result<&mut RamenGame, String> { self.game.as_mut().ok_or_else(|| "游戏尚未初始化".into()) }
     fn decision(capture: &Capture, turn: i32) -> PendingDecision {
         match capture {
             Capture::Action { kind, actions } => PendingDecision { turn: turn as u32, kind: kind.clone(), title: match kind { DecisionKind::Ramen => "选择拉面", DecisionKind::SpecialFeeling => "选择隐藏风味用法", DecisionKind::Training => "选择行动", DecisionKind::Region => "选择地区", DecisionKind::SuperRamen => "选择超级拉面", DecisionKind::Event => "选择事件" }.into(), options: action_options(actions) },
-            Capture::Event { event, choices } => PendingDecision { turn: turn as u32, kind: DecisionKind::Event, title: event.as_ref().map(|e| e.name.clone()).filter(|n| !n.is_empty()).unwrap_or_else(|| "选择事件选项".into()), options: choices.iter().enumerate().map(|(index, group)| crate::DecisionOption { index, title: format!("选项 {}", index + 1), detail: format!("{:?}", group) }).collect() },
+            Capture::Event { event, choices } => PendingDecision { turn: turn as u32, kind: DecisionKind::Event, title: event.as_ref().map(|e| e.name.clone()).filter(|n| !n.is_empty()).unwrap_or_else(|| "选择事件选项".into()), options: choices.iter().enumerate().map(|(index, group)| crate::DecisionOption { index, title: format!("选项 {}", index + 1), detail: group.iter().map(|choice| choice.explain()).collect::<Vec<_>>().join(" | ") }).collect() },
         }
     }
     fn pump_inner(&mut self) -> Result<PortResult, String> {
         loop {
             let trainer = PauseTrainer { capture: self.capture.clone() };
             let result = { let game = self.game_mut()?; game.run_stage(&trainer, &mut self.rng) };
-            if let Some(captured) = self.capture.borrow_mut().take() { let turn = self.game()?.turn(); return Ok(PortResult::Decision(Self::decision(&captured, turn))); }
+            if let Some(captured) = self.capture.borrow().as_ref() {
+                let turn = self.game()?.turn();
+                return Ok(PortResult::Decision(Self::decision(captured, turn)));
+            }
             if let Err(error) = result { return Err(error.to_string()); }
             if !self.game_mut()?.next() { return Ok(PortResult::Finished(self.summary())); }
         }
