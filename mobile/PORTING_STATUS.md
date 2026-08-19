@@ -1,10 +1,16 @@
 # 手机版改造状态
 
-本轮继续处理运行时问题：
+本轮继续完成：
 
-- 修正 Android 配置不能直接复制仓库根目录 `default_config.toml` 的问题；根目录默认配置是 `scenario=onsen`，会导致手机版拒绝启动；
-- 增加专用 `mobile/assets/game_config.toml`，明确 `scenario=ramen`、拉面杯卡组和继承配置；
-- `copy-assets.sh` 现在固定生成拉面杯配置，不再把温泉配置伪装成 `game_config.toml`；
-- 同步更新 `mobile/app/src/main/assets/game_config.toml` 模板。
+- Gradle 配置 `src/main/jniLibs`，可以打包 cargo-ndk 生成的 `.so`；
+- 增加 `mobile/scripts/build-native.sh`；
+- Android assets 安装后逐项验证文件存在且非空；
+- 构建文档明确没有 `.so` 时不能称为 APK 完成；
+- 继续使用拉面专用 `game_config.toml`，避免根目录温泉配置误用。
 
-仍在继续：native library 的 Gradle/NDK 产物接入、编译验证和真机运行。
+未完成：
+
+- 在真实 Android SDK/NDK 环境执行 `cargo-ndk` 编译；
+- 解决上游依赖在 Android target 上的实际编译兼容性；
+- 生成并安装 APK 做真机测试；
+- 固定种子回归对照。
