@@ -2,8 +2,7 @@
 
 use anyhow::{Context, Result};
 use rand::{rngs::StdRng, SeedableRng};
-use umasim::game::ramen::RamenGame;
-use umasim::game::{InheritInfo};
+use umasim::game::{InheritInfo, ramen::RamenGame};
 use umasim::gamedata::init_global_with_config;
 use umasim::utils::load_game_config;
 
