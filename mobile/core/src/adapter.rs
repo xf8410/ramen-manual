@@ -1,4 +1,7 @@
 //! 真实上游 `RamenGame` 的非阻塞触屏适配器。
+//!
+//! 说明：动作阶段的 `RamenAction::apply` 只提交当前阶段选择，PC 入口随后调用
+//! `Game::next()`；手机版也必须在提交动作后推进一次阶段，不能重新执行同一阶段。
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -13,7 +16,6 @@ use crate::{action_options, create_ramen_game, DecisionKind, GameSummary, Pendin
 
 const PAUSED: &str = "mobile decision pending";
 type SharedCapture = Rc<RefCell<Option<Capture>>>;
-
 #[derive(Clone)]
 enum Capture { Action { kind: DecisionKind, actions: Vec<RamenAction> }, Event { event: Option<EventData>, choices: Vec<Vec<EventChoice>> } }
 struct PauseTrainer { capture: SharedCapture }
@@ -50,7 +52,7 @@ impl RamenGameAdapter {
             if !self.game_mut()?.next() { return Ok(PortResult::Finished(self.summary())); }
         }
     }
-    fn summary(&self) -> GameSummary { let game = self.game.as_ref().expect("summary requires game"); GameSummary { final_turn: game.turn() as u32, score: Some(game.uma.calc_score()), pt: Some(game.ramen.scenario_pt) } }
+    fn summary(&self) -> GameSummary { let game = self.game.as_ref().expect("summary requires game"); GameSummary { final_turn: game.turn() as u32, score: Some(game.uma.calc_score()), pt: Some(game.uma.total_pt()) } }
 }
 impl RamenGamePort for RamenGameAdapter {
     fn initialize(&mut self) -> Result<(), String> { let (game, rng) = create_ramen_game(self.config).map_err(|e| e.to_string())?; self.game = Some(game); self.rng = rng; self.capture.borrow_mut().take(); Ok(()) }
@@ -58,8 +60,21 @@ impl RamenGamePort for RamenGameAdapter {
     fn choose(&mut self, index: usize) -> Result<PortResult, String> {
         let captured = self.capture.borrow_mut().take().ok_or_else(|| "当前没有待决策".to_string())?;
         match captured {
-            Capture::Action { actions, .. } => { if index >= actions.len() { return Err(format!("动作索引越界: {} / {}", index, actions.len())); } let action = actions[index]; let mut game = self.game.take().ok_or_else(|| "游戏尚未初始化".to_string())?; let result = action.apply(&mut game, &mut self.rng).map_err(|e| e.to_string()); self.game = Some(game); result?; }
-            Capture::Event { event, choices } => { if index >= choices.len() { return Err(format!("事件选项索引越界: {} / {}", index, choices.len())); } let event = event.ok_or_else(|| "事件数据缺失".to_string())?; let game = self.game_mut()?; game.apply_event(&event, index, &mut self.rng).map_err(|e| e.to_string())?; }
+            Capture::Action { actions, .. } => {
+                if index >= actions.len() { return Err(format!("动作索引越界: {} / {}", index, actions.len())); }
+                let action = actions[index];
+                let mut game = self.game.take().ok_or_else(|| "游戏尚未初始化".to_string())?;
+                action.apply(&mut game, &mut self.rng).map_err(|e| e.to_string())?;
+                self.game = Some(game);
+                // PC run_full_game 在 run_stage 返回后调用 next()；动作提交也必须完成同样推进。
+                self.game_mut()?.next();
+            }
+            Capture::Event { event, choices } => {
+                if index >= choices.len() { return Err(format!("事件选项索引越界: {} / {}", index, choices.len())); }
+                let event = event.ok_or_else(|| "事件数据缺失".to_string())?;
+                let game = self.game_mut()?;
+                game.apply_event(&event, index, &mut self.rng).map_err(|e| e.to_string())?;
+            }
         }
         self.pump_inner()
     }
