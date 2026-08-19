@@ -10,12 +10,6 @@ rustup target list --installed | grep -q '^aarch64-linux-android$' || {
   exit 1
 }
 
-# Always invoke helpers through bash: Git checkouts may not preserve executable bits.
-bash ./scripts/copy-assets.sh
-
-# cargo-ndk 4.x expects --manifest-path before the Cargo subcommand.
-cargo ndk \
-  -t arm64-v8a \
-  -o app/src/main/jniLibs \
-  --manifest-path core/Cargo.toml \
-  build --release
+./scripts/copy-assets.sh
+cd "$ROOT/mobile/core"
+cargo ndk -t arm64-v8a -o "$ROOT/mobile/app/src/main/jniLibs" build --release
