@@ -1,6 +1,4 @@
 //! 真实上游 `RamenGame` 的非阻塞触屏适配器。
-//!
-//! 动作提交后只推进一次 `Game::next()`；候选在 UI 等待期间保留，直到 choose 执行。
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -22,12 +20,8 @@ impl Trainer<RamenGame> for PauseTrainer {
         let kind = match game.stage { RamenStage::RamenSelect => DecisionKind::Ramen, RamenStage::SpecialSelect => DecisionKind::SpecialFeeling, RamenStage::RegionSelect => DecisionKind::Region, RamenStage::SuperRamenSelect => DecisionKind::SuperRamen, _ => DecisionKind::Training };
         self.pause(Capture::Action { kind, actions: actions.to_vec() })
     }
-    fn select_choice(&self, _game: &RamenGame, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> {
-        self.pause(Capture::Event { event: EventData::default(), choices: choices.to_vec() })
-    }
-    fn select_event_choice(&self, _game: &RamenGame, event: &EventData, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> {
-        self.pause(Capture::Event { event: event.clone(), choices: choices.to_vec() })
-    }
+    fn select_choice(&self, _game: &RamenGame, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> { self.pause(Capture::Event { event: EventData::default(), choices: choices.to_vec() }) }
+    fn select_event_choice(&self, _game: &RamenGame, event: &EventData, choices: &[Vec<EventChoice>], _rng: &mut StdRng) -> Result<usize> { self.pause(Capture::Event { event: event.clone(), choices: choices.to_vec() }) }
 }
 
 pub struct RamenGameAdapter { game: Option<RamenGame>, rng: StdRng, capture: SharedCapture, config: RamenMobileConfig }
@@ -48,7 +42,8 @@ impl RamenGameAdapter {
         loop {
             let trainer = PauseTrainer { capture: self.capture.clone() };
             let result = { let game = self.game_mut()?; game.run_stage(&trainer, &mut self.rng) };
-            if let Some(captured) = self.capture.borrow().as_ref() { let turn = self.game()?.turn(); return Ok(PortResult::Decision(Self::decision(captured, turn))); }
+            let captured = self.capture.borrow().clone();
+            if let Some(captured) = captured { let turn = self.game()?.turn(); return Ok(PortResult::Decision(Self::decision(&captured, turn))); }
             if let Err(error) = result { return Err(error.to_string()); }
             if !self.game_mut()?.next() { return Ok(PortResult::Finished(self.summary())); }
         }
