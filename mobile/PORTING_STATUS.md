@@ -1,11 +1,17 @@
 # 手机版改造状态
 
-本轮继续修复真实适配器：
+本轮继续完成：
 
-- 待决策候选在 `pump()` 返回后保持到 `choose()`，不会提前丢失；
-- 动作提交后推进一次上游 `Game::next()`，避免重复运行当前阶段；
-- 结算 PT 使用原 PC 入口的 `game.uma.total_pt()`，不是尚未结算/已清零的 `ramen.scenario_pt`；
-- 初始化改为加载 `game_config.toml` 并调用 `init_global_with_config`，与 PC `ramen_manual.rs` 一致；
-- `RamenMobileConfig` 改为可 Clone，避免所有权错误。
+- Rust crate 增加 `cdylib` 输出和 `jni`/`serde_json` 依赖；
+- JNI `nativeSetDataRoot`、`nativeStart`、`nativeSubmit`、`nativeReset`；
+- Android Kotlin 页面已经调用 JNI，而不是 FakeDriver；
+- Android 启动时解压拉面杯 assets，并设置 Rust 工作目录；
+- 添加 ARM64 构建说明和 Rust target 配置；
+- 修复真实适配器的候选保存、阶段推进、PC 配置初始化和结算 PT 映射。
 
-仍在继续：事件暂停恢复的阶段级验证、Android assets 解压、ARM64 工程、编译和回归测试。
+仍未完成：
+
+- 实际安装 NDK/SDK 后的编译验证；
+- cargo/Gradle wrapper 与 JNI 动态库产物；
+- 真机测试；
+- 固定种子与 Windows 版的回归差异检查。
