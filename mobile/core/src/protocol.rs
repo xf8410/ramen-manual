@@ -51,8 +51,12 @@ impl From<&MobileState> for UiState {
     }
 }
 
+impl From<MobileState> for UiState {
+    fn from(state: MobileState) -> Self { (&state).into() }
+}
+
 impl UiState {
-    pub fn waiting() -> Self { MobileState::WaitingForStart.into() }
-    pub fn from_decision(decision: &PendingDecision) -> Self { MobileState::Decision(decision.clone()).into() }
-    pub fn finished(summary: &GameSummary) -> Self { MobileState::Finished(summary.clone()).into() }
+    pub fn waiting() -> Self { UiState::from(&MobileState::WaitingForStart) }
+    pub fn from_decision(decision: &PendingDecision) -> Self { UiState::from(&MobileState::Decision(decision.clone())) }
+    pub fn finished(summary: &GameSummary) -> Self { UiState::from(&MobileState::Finished(summary.clone())) }
 }
