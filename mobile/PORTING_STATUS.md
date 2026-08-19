@@ -1,15 +1,19 @@
 # 手机版改造状态
 
-本轮继续修复：
+本轮继续完成：
 
-- JNI 会话由线程局部存储改为 `OnceLock<Mutex<...>>`，避免 Android UI 回调跨线程后丢失游戏会话；
-- JNI 数据目录同样使用互斥保护；
-- 事件暂停时保留完整 `EventData` 和候选组，提交索引后调用上游 `RamenGame::apply_event`；
-- 触屏 UI 仍只提交索引，不复制事件或拉面规则。
+- JNI native session 使用全局 Mutex，支持 Android 回调线程切换；
+- RamenGameAdapter 的候选和事件状态使用 Arc/Mutex；
+- 增加 release R8/资源压缩配置并保留 JNI 类；
+- Android Manifest 增加明确的备份和 RTL 配置；
+- Debug/Release APK 输出路径和构建命令已记录。
 
-仍未完成：
+当前真实状态：
 
-- 真实 CI/Android 编译验证；
-- 上游 crate 的 Android 依赖裁剪；
-- APK 安装与完整 77 回合触屏流程验证；
-- PC 固定种子回归对照。
+- Rust/Android 代码已写到 JNI 和 Gradle 接入层；
+- 尚无 GitHub Actions run 结果；
+- 尚未在实际 SDK/NDK 环境编译；
+- 尚未安装 APK 真机测试；
+- 尚未完成固定种子 PC 回归。
+
+不能把配置文件存在等同于 APK 构建成功，后续继续以真实编译日志为准。
