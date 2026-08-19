@@ -1,0 +1,44 @@
+INFO [umasim::gamedata::config] 载入游戏数据
+INFO [umasim::gamedata] 载入数据 gamedata/constants.json
+INFO [umasim::gamedata] 载入数据 gamedata/umaDB.json
+INFO [umasim::gamedata] 载入数据 gamedata/cardDB.json
+INFO [umasim::gamedata] 载入数据 gamedata/text_data_dict.json
+INFO [umasim::gamedata] 载入数据 gamedata/events.json
+INFO [umasim::gamedata] 载入 262 马娘, 547 支援卡
+INFO [umasim::gamedata] 载入数据 gamedata/scenario_onsen.json
+INFO [umasim::gamedata] 载入数据 gamedata/scenario_ramen.json
+INFO [umasim::game::base] [92m美浦波旁 体力 100/100 普通  速117 耐88 力112 根124 智109 PT0 Hint21 赛后0[0m
+INFO [umasim::game::base] [速]杏目◆ 4 +初始属性 [0, 0, 0, 0, 0, 40] 赛后15
+INFO [umasim::game::base] [智]青春◆ 4 +初始属性 [0, 0, 0, 0, 0, 40] 赛后10
+INFO [umasim::game::base] [耐]名将◆ 4 +初始属性 [0, 0, 0, 30, 0, 60] 赛后10
+INFO [umasim::game::base] [速]洛林◆ 4 +初始属性 [25, 0, 30, 0, 0, 0] 赛后10
+INFO [umasim::game::base] [速]里见◆ 4 +初始属性 [25, 0, 20, 0, 0, 0] 赛后10
+INFO [umasim::game::base] [友]骏川◆ 4 +初始属性 [0, 0, 0, 0, 0, 40] 赛后5
+INFO [umasim::game::base] +继承: [105, 21, 0, 0, 0]
+INFO [ramen_manual] 开始 ManualTrainer 手动模拟...
+INFO [umasim::game::ramen::game] -----------------------------------------
+INFO [umasim::game::ramen::game] 回合: 1-Begin 设施等级: [1, 1, 1, 1, 1] 友人: 未点击
+[92m美浦波旁 体力 100/100 普通  速272 耐109 力162 根154 智109 PT180 Hint21 赛后60[0m
+INFO [umasim::game::traits] + 事件: #400000400 马娘登场
+INFO [umasim::game::uma] [90m120pt[0m
+INFO [umasim::game::ramen::game] 训练:
++--------------+--------------+--------------+--------------+--------------+
+| 速           | 耐           | 力           | 根           | 智           |
++==========================================================================+
+| [速]杏目30   | [智]青春30   | [速]洛林35   | [耐]名将35   |              |
+|--------------+--------------+--------------+--------------+--------------|
+| [速]里见35   |              |              |              |              |
+|--------------+--------------+--------------+--------------+--------------|
+|              |              |              |              |              |
+|--------------+--------------+--------------+--------------+--------------|
+|              |              |              |              |              |
+|--------------+--------------+--------------+--------------+--------------|
+|              |              |              |              |              |
+|--------------+--------------+--------------+--------------+--------------|
+|              |              |              |              |              |
++--------------+--------------+--------------+--------------+--------------+
+速 速18 力3 15pt 体力-20
+耐 耐13 根3 10pt 体力-20
+力 耐9 力12 10pt 体力-21
+根 速2 力2 根13 10pt 体力-21
+智 速3 智7 7pt 体力5
